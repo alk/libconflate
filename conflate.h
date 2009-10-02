@@ -255,7 +255,8 @@ typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
                                                            const char *cmd,
                                                            bool direct,
                                                            kvpair_t *pair,
-                                                           conflate_form_result *r);
+                                                           conflate_form_result *r,
+                                                           void *cb_data);
 
 /**
  * Register a management command handler.
@@ -278,7 +279,7 @@ typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
  * @param cb the callback to issue when this command is invoked
  */
 void conflate_register_mgmt_cb(const char *cmd, const char *desc,
-                               conflate_mgmt_cb_t cb)
+                               conflate_mgmt_cb_t cb, void *data)
     __attribute__ ((nonnull (1, 2, 3)));
 
 /**

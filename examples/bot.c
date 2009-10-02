@@ -49,7 +49,8 @@ static enum conflate_mgmt_cb_result process_stats(void *opaque,
                                                   const char *cmd,
                                                   bool direct,
                                                   kvpair_t *form,
-                                                  conflate_form_result *r)
+                                                  conflate_form_result *r,
+                                                  void *data)
 {
     /* Only direct stat requests are handled. */
     assert(direct);
@@ -73,7 +74,8 @@ static enum conflate_mgmt_cb_result process_reset_stats(void *opaque,
                                                         const char *cmd,
                                                         bool direct,
                                                         kvpair_t *form,
-                                                        conflate_form_result *r)
+                                                        conflate_form_result *r,
+                                                        void *data)
 {
     char *subtype = get_simple_kvpair_val(form, "-subtype-");
 
@@ -91,7 +93,8 @@ static enum conflate_mgmt_cb_result process_ping_test(void *opaque,
                                                       const char *cmd,
                                                       bool direct,
                                                       kvpair_t *form,
-                                                      conflate_form_result *r)
+                                                      conflate_form_result *r,
+                                                      void *data)
 {
     kvpair_t *servers_p = find_kvpair(form, "servers");
     if (!servers_p) {
@@ -120,7 +123,8 @@ static enum conflate_mgmt_cb_result process_alarm_create(void *opaque,
                                                          const char *cmd,
                                                          bool direct,
                                                          kvpair_t *form,
-                                                         conflate_form_result *r)
+                                                         conflate_form_result *r,
+                                                         void *data)
 {
 	if(add_alarm(handle->alarms, "test", "This is a test alarm!")) {
         fprintf(stderr, "Created alarm!\n");
@@ -143,15 +147,15 @@ int main(int argc, char **argv) {
      * entire application.
      */
     conflate_register_mgmt_cb("client_stats", "Retrieves stats from the agent",
-                              process_stats);
+                              process_stats, NULL);
     conflate_register_mgmt_cb("reset_stats", "Reset stats on the agent",
-                              process_reset_stats);
+                              process_reset_stats, NULL);
 
     conflate_register_mgmt_cb("ping_test", "Perform a ping test",
-                              process_ping_test);
+                              process_ping_test, NULL);
 
-	conflate_register_mgmt_cb("alarm", "Create an alarm",
-                              process_alarm_create);
+    conflate_register_mgmt_cb("alarm", "Create an alarm",
+			      process_alarm_create, NULL);
 
     /* Perform default configuration initialization. */
     conflate_config_t conf;

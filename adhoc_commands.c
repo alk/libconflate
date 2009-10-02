@@ -15,7 +15,8 @@ static enum conflate_mgmt_cb_result process_serverlist(void *opaque,
                                                        const char *cmd,
                                                        bool direct,
                                                        kvpair_t *conf,
-                                                       conflate_form_result *r)
+                                                       conflate_form_result *r,
+                                                       void *dummy)
 {
     /* If we have "config_is_private" set to "yes" we should only
        process this if it's direct (i.e. ignore pubsub) */
@@ -50,7 +51,8 @@ static enum conflate_mgmt_cb_result process_set_private(void *opaque,
                                                         const char *cmd,
                                                         bool direct,
                                                         kvpair_t *form,
-                                                        conflate_form_result *r)
+                                                        conflate_form_result *r,
+                                                        void *data)
 {
     /* Only direct stat requests are handled. */
     assert(direct);
@@ -76,7 +78,8 @@ static enum conflate_mgmt_cb_result process_get_private(void *opaque,
                                                         const char *cmd,
                                                         bool direct,
                                                         kvpair_t *form,
-                                                        conflate_form_result *r)
+                                                        conflate_form_result *r,
+                                                        void *data)
 {
     /* Only direct stat requests are handled. */
     assert(direct);
@@ -107,7 +110,8 @@ static enum conflate_mgmt_cb_result process_delete_private(void *opaque,
                                                            const char *cmd,
                                                            bool direct,
                                                            kvpair_t *form,
-                                                           conflate_form_result *r)
+                                                           conflate_form_result *r,
+                                                           void *data)
 {
     /* Only direct stat requests are handled. */
     assert(direct);
@@ -135,16 +139,16 @@ void conflate_init_commands(void)
 
     conflate_register_mgmt_cb("set_private",
                               "Set a private value on the agent.",
-                              process_set_private);
+                              process_set_private, NULL);
     conflate_register_mgmt_cb("get_private",
                               "Get a private value from the agent.",
-                              process_get_private);
+                              process_get_private, NULL);
     conflate_register_mgmt_cb("rm_private",
                               "Delete a private value from the agent.",
-                              process_delete_private);
+                              process_delete_private, NULL);
 
     conflate_register_mgmt_cb("serverlist", "Configure a server list.",
-                              process_serverlist);
+                              process_serverlist, NULL);
 
     commands_initialized = true;
 }

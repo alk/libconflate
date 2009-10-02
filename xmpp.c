@@ -30,13 +30,14 @@ struct command_def {
     char *name;
     char *description;
     conflate_mgmt_cb_t cb;
+    void *data;
     struct command_def *next;
 };
 
 struct command_def *commands = NULL;
 
 void conflate_register_mgmt_cb(const char *cmd, const char *desc,
-                               conflate_mgmt_cb_t cb)
+                               conflate_mgmt_cb_t cb, void *data)
 {
     struct command_def *c = calloc(1, sizeof(struct command_def));
     assert(c);
@@ -44,6 +45,7 @@ void conflate_register_mgmt_cb(const char *cmd, const char *desc,
     c->name = safe_strdup(cmd);
     c->description = safe_strdup(desc);
     c->cb = cb;
+    c->data = data;
     c->next = commands;
 
     commands = c;
@@ -375,7 +377,8 @@ static xmpp_stanza_t* n_handler(const char *cmd,
                                 xmpp_stanza_t * const stanza,
                                 void * const userdata,
                                 bool direct,
-                                conflate_mgmt_cb_t cb)
+                                conflate_mgmt_cb_t cb,
+                                void *cb_data)
 {
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
     xmpp_ctx_t *ctx = handle->ctx;
@@ -402,7 +405,7 @@ static xmpp_stanza_t* n_handler(const char *cmd,
     }
 
     enum conflate_mgmt_cb_result rv = cb(handle->conf->userdata, handle,
-                                         cmd, direct, form, &result);
+                                         cmd, direct, form, &result, cb_data);
 
     CONFLATE_LOG(handle, DEBUG, "Result of %s:  %s", cmd, cb_name(rv));
 
@@ -437,16 +440,18 @@ static xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
     conflate_handle_t *handle = (conflate_handle_t*) userdata;
 
     conflate_mgmt_cb_t cb = NULL;
+    void *cb_data = NULL;
     struct command_def *p = commands;
 
     for (p = commands; p && !cb; p = p->next) {
         if (strcmp(cmd, p->name) == 0) {
             cb = p->cb;
+            cb_data = p->cb;
         }
     }
 
     if (cb) {
-        return n_handler(cmd, req, conn, stanza, handle, direct, cb);
+        return n_handler(cmd, req, conn, stanza, handle, direct, cb, cb_data);
     } else {
         return error_unknown_command(cmd, req, conn, stanza, handle, direct);
     }
