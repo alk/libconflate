@@ -249,6 +249,7 @@ enum conflate_mgmt_cb_result {
  * @param direct if true, this is a directed command (else issued via pubsub)
  * @param pair the form sent with this command (may be NULL)
  * @param r the result form being built
+ * @param userdata the user data registerd with this callback
  */
 typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
                                                            conflate_handle_t *handle,
@@ -256,7 +257,7 @@ typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
                                                            bool direct,
                                                            kvpair_t *pair,
                                                            conflate_form_result *r,
-                                                           void *cb_data);
+                                                           void *userdata);
 
 /**
  * Register a management command handler.
@@ -277,9 +278,10 @@ typedef enum conflate_mgmt_cb_result (*conflate_mgmt_cb_t)(void *opaque,
  * @param cmd the node name of the command
  * @param desc short description of the command
  * @param cb the callback to issue when this command is invoked
+ * @param userdata user data to be supplied to the callback
  */
 void conflate_register_mgmt_cb(const char *cmd, const char *desc,
-                               conflate_mgmt_cb_t cb, void *data)
+                               conflate_mgmt_cb_t cb, void *userdata)
     __attribute__ ((nonnull (1, 2, 3)));
 
 /**
