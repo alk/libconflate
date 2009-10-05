@@ -446,7 +446,7 @@ static xmpp_stanza_t* command_dispatch(xmpp_conn_t * const conn,
     for (p = commands; p && !cb; p = p->next) {
         if (strcmp(cmd, p->name) == 0) {
             cb = p->cb;
-            cb_data = p->cb;
+            cb_data = p->data;
         }
     }
 
